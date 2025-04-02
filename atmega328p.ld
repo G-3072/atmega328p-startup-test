@@ -5,6 +5,8 @@ MEMORY
     EEPROM (rw) :   ORIGIN = 0x810000, LENGTH = 1K      /* EEPROM memory, 1KB, (Byte addressed) , offset = 0x810000 */
 }
 
+RAMEND = ORIGIN(RAM) + LENGTH(RAM) -1;
+
 SECTIONS
 {
     .text :
@@ -17,10 +19,28 @@ SECTIONS
         *(.text.*)
         . = ALIGN(2);
 
+        _etext = .;
     } > FLASH
 
     .data :
     {
-        . = align 
+        . = ALIGN(2)
+        _sdata = .;
+
+        *(.data)
+
+        . = ALIGN(2);
+        _edata = .;
     } >RAM AT> FLASH
+
+    .bss :
+    {
+        . = ALIGN(2);
+        _sbss = .;
+
+        *(.bss)
+
+        . = ALIGN(2);
+        _ebss = .;
+    } > RAM
 }
