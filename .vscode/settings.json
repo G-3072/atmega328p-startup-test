@@ -1,0 +1,33 @@
+{
+    "VsCodeTaskButtons.showCounter": false,
+    "VsCodeTaskButtons.tasks": [
+        {
+            "label": "Arduino: Build",
+            "alignment": "left",
+            "task": "buildProject",
+            "tooltip": "build proect for atmega328p"
+        },
+        {
+            "label": "Arduino: Rebuild",
+            "alignment": "left",
+            "task": "rebuild",
+        },
+        {
+            "label": "Arduino: Upload work PC",
+            "alignment": "left",
+            "task": "upload",
+            "tooltip": "Upload last built executable to arduino"
+        },
+        {
+            "label": "Arduino: Upload Home PC",
+            "alignment": "left",
+            "task": "upload 2",
+            "tooltip": "Upload last built executable to arduino"
+        },
+    ],
+    "files.associations": {
+        "io.h": "c",
+        "iom328p.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
+}

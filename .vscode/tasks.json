@@ -1,0 +1,72 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "buildProject",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-G",
+                "Ninja",
+                "-DCMAKE_BUILD_TYPE=Release",
+                "-DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/cmake/avr-gcc.cmake",
+                "-B",
+                "${workspaceFolder}/build",
+                "&&",
+                "cmake",
+                "--build",
+                "${workspaceFolder}/build",
+                "--verbose"
+
+            ],
+        },
+        {
+            "label": "upload",
+            "type": "shell",
+            "command": "/mnt/c/Users/gasc/AppData/Local/Arduino15/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude.exe",
+            "args": [
+                "-C",
+                "/home/gasc/work/arduino/arduino-bare-metal/avrdude.conf",
+                "-v",
+                "-p",
+                "atmega328p",
+                "-c",
+                "arduino",
+                "-P",
+                "COM3",
+                "-b",
+                "115200",
+                "-U",
+                "flash:w:/home/gasc/work/arduino/atmega328p-startup-test/build/arduino-startup-test.hex:i"
+            ],
+            "dependsOn": "buildProject"
+
+        },
+        
+        {
+            "label": "rebuild",
+            "dependsOn":[
+                "remove build",
+                "buildProject"
+            ]
+        },
+        {
+            "label": "remove build",
+            "type": "shell",
+            "command": "rm",
+            "args": [
+                "-rf",
+                "build/*"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "problemMatcher": []
+        }
+    ]
+}
