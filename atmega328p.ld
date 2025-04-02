@@ -16,29 +16,36 @@ SECTIONS
 
         *(.text)
         . = ALIGN(2);
-        *(.text.*)
-        . = ALIGN(2);
 
+        *(.text.*)
+
+        . = ALIGN(2);
         _etext = .;
     } > FLASH
 
     .data :
     {
+        _dataLMA = LOADADDR(.data);
         . = ALIGN(2);
         _sdata = .;
 
         *(.data)
+        *(.data.*)
+
+        *(.rodata)
+        *(.rodata.*)
 
         . = ALIGN(2);
         _edata = .;
     } >RAM AT> FLASH
 
-    .bss :
+    .bss ADDR(.data) + SIZEOF (.data) : 
     {
         . = ALIGN(2);
         _sbss = .;
 
         *(.bss)
+        *(COMMON)
 
         . = ALIGN(2);
         _ebss = .;

@@ -1,0 +1,1 @@
+- currently assuming linker symbols like _sdata _dataLMA are byte addresses if not working try writing code for word addresses
