@@ -5,8 +5,8 @@ main:
 
 blink:
   sbi   0x03, 5     ; Toggle PINB
-  ldi   r25, hi8(100)
-  ldi   r24, lo8(100)
+  ldi   r25, hi8(500)
+  ldi   r24, lo8(500)
   rcall  delay_ms
   rjmp   blink
 

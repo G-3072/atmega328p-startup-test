@@ -24,7 +24,7 @@ SECTIONS
 
     .data :
     {
-        . = ALIGN(2)
+        . = ALIGN(2);
         _sdata = .;
 
         *(.data)
