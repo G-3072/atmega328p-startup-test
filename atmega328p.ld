@@ -1,11 +1,11 @@
 MEMORY
 {
-    RAM (rwx)   :   ORIGIN = 0x800000, LENGTH = 2K      /* RAM memory , 2KB Byte addressed --> 2048 * 8bit, offset = 0x800000,  */
+    RAM (rwx)   :   ORIGIN = 0x800100, LENGTH = 2K      /* RAM memory , 2KB Byte addressed --> 2048 * 8bit, offset = 0x800000,  */
     FLASH (rx)  :   ORIGIN = 0x000000, LENGTH = 32K     /* Flash memory, 32KB word addressed --> 16K * 16bit, offset = 0x0 */
     EEPROM (rw) :   ORIGIN = 0x810000, LENGTH = 1K      /* EEPROM memory, 1KB, (Byte addressed) , offset = 0x810000 */
 }
 
-RAMEND = ORIGIN(RAM) + LENGTH(RAM) -1;
+/* ENTRY(Reset_Handler) */
 
 SECTIONS
 {
@@ -17,15 +17,14 @@ SECTIONS
         *(.text)
         . = ALIGN(2);
 
-        *(.text.*)
+        *(.text*)
 
         . = ALIGN(2);
-        _etext = .;
     } > FLASH
 
     .data :
     {
-        _dataLMA = LOADADDR(.data);
+        _sidata = LOADADDR(.data);
         . = ALIGN(2);
         _sdata = .;
 
@@ -33,18 +32,19 @@ SECTIONS
         *(.data.*)
 
         *(.rodata)
-        *(.rodata.*)
+        *(.rodata*)
 
         . = ALIGN(2);
         _edata = .;
     } >RAM AT> FLASH
 
-    .bss ADDR(.data) + SIZEOF (.data) : 
+    .bss : 
     {
         . = ALIGN(2);
         _sbss = .;
 
         *(.bss)
+        *(.bss*)
         *(COMMON)
 
         . = ALIGN(2);

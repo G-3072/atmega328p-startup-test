@@ -1,95 +1,264 @@
-.section .vectors
+
+
+.section .vectors, "ax"
 
 .global __vectors
-.global __start
-
-.global INT0_isr, INT1_isr, PCINT0_isr, PCINT1_isr, PCINT2_isr
-.global WDT_isr, TIM2_COMPA_isr, TIM2_COMPB_isr, TIM2_OVF_isr
-.global TIM1_CAPT_isr, TIM1_COMPA_isr, TIM1_COMPB_isr, TIM1_OVF_isr
-.global TIM0_OVF_isr, TIM0_COMPA_isr, TIM0_COMPB_isr
-.global SPI_STC_isr, USART_RX_isr, USART_UDRE_isr, USART_TX_isr
-.global ADC_isr, EE_READY_isr, AN_COMP_isr, TWI_isr, SPM_READY_isr
-
-.weak INT0_isr, INT1_isr, PCINT0_isr, PCINT1_isr, PCINT2_isr
-.weak WDT_isr, TIM2_COMPA_isr, TIM2_COMPB_isr, TIM2_OVF_isr
-.weak TIM1_CAPT_isr, TIM1_COMPA_isr, TIM1_COMPB_isr, TIM1_OVF_isr
-.weak TIM0_OVF_isr, TIM0_COMPA_isr, TIM0_COMPB_isr
-.weak SPI_STC_isr, USART_RX_isr, USART_UDRE_isr, USART_TX_isr
-.weak ADC_isr, EE_READY_isr, AN_COMP_isr, TWI_isr, SPM_READY_isr
+.global Reset_Handler
 
 __vectors:
-    .org 0x00
-    rjmp __start    ; startup code
-    .org 0x02
-    rjmp INT0_isr   ; INT0 isr
-    .org 0x04
-    rjmp INT1_isr
-    .org 0x06
-    rjmp PCINT0_isr
-    .org 0x08
-    rjmp PCINT1_isr
-    .org 0x0A
-    rjmp PCINT2_isr
-    .org 0x0C
-    rjmp WDT_isr
-    .org 0x0E
-    rjmp TIM2_COMPA_isr
-    .org 0x10
-    rjmp TIM2_COMPB_isr
-    .org 0x12
-    rjmp TIM2_OVF_isr
-    .org 0x14
-    rjmp TIM1_CAPT_isr
-    .org 0x16
-    rjmp TIM1_COMPA_isr
-    .org 0x18
-    rjmp TIM1_COMPB_isr
-    .org 0x1A
-    rjmp TIM1_OVF_isr
-    .org 0x1C
-    rjmp TIM0_OVF_isr
-    .org 0x1E
-    rjmp TIM0_COMPA_isr
-    .org 0x20
-    rjmp TIM0_COMPB_isr
-    .org 0x22
-    rjmp SPI_STC_isr
-    .org 0x24
-    rjmp USART_RX_isr
-    .org 0x26
-    rjmp USART_UDRE_isr
-    .org 0x28
-    rjmp USART_TX_isr
-    .org 0x2A
-    rjmp ADC_isr
-    .org 0x2C
-    rjmp EE_READY_isr
-    .org 0x2E
-    rjmp AN_COMP_isr
-    .org 0x30
-    rjmp TWI_isr
-    .org 0x32
-    rjmp SPM_READY_isr
+.org 0x00
+rjmp Reset_Handler    ; startup code
+.org 0x02
+rjmp INT0_isr   ; INT0 isr
+.org 0x04
+rjmp INT1_isr
+.org 0x06
+rjmp PCINT0_isr
+.org 0x08
+rjmp PCINT1_isr
+.org 0x0A
+rjmp PCINT2_isr
+.org 0x0C
+rjmp WDT_isr
+.org 0x0E
+rjmp TIM2_COMPA_isr
+.org 0x10
+rjmp TIM2_COMPB_isr
+.org 0x12
+rjmp TIM2_OVF_isr
+.org 0x14
+rjmp TIM1_CAPT_isr
+.org 0x16
+rjmp TIM1_COMPA_isr
+.org 0x18
+rjmp TIM1_COMPB_isr
+.org 0x1A
+rjmp TIM1_OVF_isr
+.org 0x1C
+rjmp TIM0_OVF_isr
+.org 0x1E
+rjmp TIM0_COMPA_isr
+.org 0x20
+rjmp TIM0_COMPB_isr
+.org 0x22
+rjmp SPI_STC_isr
+.org 0x24
+rjmp USART_RX_isr
+.org 0x26
+rjmp USART_UDRE_isr
+.org 0x28
+rjmp USART_TX_isr
+.org 0x2A
+rjmp ADC_isr
+.org 0x2C
+rjmp EE_READY_isr
+.org 0x2E
+rjmp AN_COMP_isr
+.org 0x30
+rjmp TWI_isr
+.org 0x32
+rjmp SPM_READY_isr
+
 
 .section .text
 
 .word _sdata
 .word _edata
-.word _dataLMA
+.word _sidata
 
-__start:
-    ; no need to set SP set by Hardware
+.word _sbss
+.word _ebss
 
-    ; copy data from flash to ram
-    copyDataSection:
-        ldi r30, lo8(_dataLMA)      ; store data load Memory Address in Z register (FLash address)
-        ldi r31, hi8(_dataLMA)
+.global main
+.weak main
 
-        ldi r26, lo8(_sdata)        ; store data virtual memory address in X register (Ram Address)
-        ldi r27, hi8(_sdata)
+Reset_Handler:
+    sbi 0x04, 5
+    sbi 0x05, 5
+    setStackPointer:        ; set the Stack Pointer to the top of RAM
+    .equ SPH, 0x3E
+    .equ SPL, 0x3D
+    
+    ldi r16, lo8(0x08FF)
+    ldi r17, hi8(0x08FF)
+    out SPL, r16            ; write low-byte of ram end to SPL reg (0x3D)
+    out SPH, r17            ; write high byte of ram end to SPH reg (0x3E)
 
-        ldi r28, lo9(_edata)        ; store data section end address (RAM) 
-        ldi r29, hi8(_edata)
+    copyDataSection:                ; copy the .data section from flash memory to ram
+    ldi r30, lo8(_sidata)      ; store data load Memory Address in Z register (FLash address)
+    ldi r31, hi8(_sidata)
+
+    ldi r26, lo8(_sdata)        ; store data virtual memory address in X register (Ram Address)
+    ldi r27, hi8(_sdata)
+
+    ldi r28, lo8(_edata)        ; store data section end address (RAM) 
+    ldi r29, hi8(_edata)
 
     copyDataLoop:
-        
+    lpm r16, Z+
+    st X+, r16
+
+    cp r28, r26         
+    brne copyDataLoop       ; jump back to copydata loop if current address (X register) is not equal to data end address
+
+    cp r29, r27
+    brne copyDataLoop
+
+    zeroBssSection:             ; zero out the .bss section in Ram
+    ldi r26, lo8(_sbss)         ; store bss start address in X register
+    ldi r27, hi8(_sbss)
+
+    ldi r28, lo8(_ebss)         ; store bss end address in Y register
+    ldi r29, hi8(_ebss)
+
+    ldi r16, 0x00
+
+    ZeroBssLoop:
+    st X+, r16
+    
+    cp r26, r28
+    ; brne ZeroBssLoop        ; jump back to zeroBssLoop if current ram address (X register) isnt equal to bss end address
+
+    cpC r27, r29
+    brne ZeroBssLoop
+    ; sbi 0x04, 5
+    ; cbi 0x05, 5
+    enableInterrupts:           ; set global interrupt bit in SREG
+    sei
+    ; cli
+    
+    clearSREG:                  ; clear the status register flags (bc seen in avr std startup code)
+    .equ SREG, 0x3F
+    clr r0
+    out SREG, r0
+
+    callMain:
+    rcall main
+    
+    infiniteLoop:               ; infinite loop to catch program should it return from main
+    rjmp infiniteLoop
+
+.global default_handler
+.weak default_handler
+default_handler:
+    
+    rjmp default_handler    ; infinite loop to make sure program doesnt do upredictable stuff
+
+.weak INT0_isr
+INT0_isr:
+    rjmp default_handler
+
+.weak INT1_isr
+INT1_isr:
+    rjmp default_handler
+
+.weak PCINT0_isr
+PCINT0_isr:
+    rjmp default_handler
+
+.weak PCINT1_isr
+PCINT1_isr:
+    rjmp default_handler
+
+.weak PCINT2_isr
+PCINT2_isr:
+    rjmp default_handler
+
+.weak WDT_isr
+WDT_isr:
+    rjmp default_handler
+
+.weak TIM2_COMPA_isr
+TIM2_COMPA_isr:
+    rjmp default_handler
+
+.weak TIM2_COMPB_isr
+TIM2_COMPB_isr:
+    rjmp default_handler
+
+.weak TIM2_OVF_isr
+TIM2_OVF_isr:
+    rjmp default_handler
+
+.weak TIM1_CAPT_isr
+TIM1_CAPT_isr:
+    rjmp default_handler
+
+.weak TIM1_COMPA_isr
+TIM1_COMPA_isr:
+    rjmp default_handler
+
+.weak TIM1_COMPB_isr
+TIM1_COMPB_isr:
+    rjmp default_handler
+
+.weak TIM1_OVF_isr
+TIM1_OVF_isr:
+    rjmp default_handler
+
+.weak TIM0_COMPA_isr
+TIM0_COMPA_isr:
+    rjmp default_handler
+
+.weak TIM2_COMPB_isr
+TIM0_COMPB_isr:
+    rjmp default_handler
+
+.weak TIM2_OVF_isr
+TIM0_OVF_isr:
+    rjmp default_handler
+
+.weak SPI_STC_isr
+SPI_STC_isr:
+    rjmp default_handler
+
+.weak USART_RX_isr
+USART_RX_isr:
+    rjmp default_handler
+
+.weak USART_UDRE_isr
+USART_UDRE_isr:
+    rjmp default_handler
+
+.weak USART_TX_isr
+USART_TX_isr:
+    rjmp default_handler
+
+.weak ADC_isr
+ADC_isr:
+    rjmp default_handler
+
+.weak EE_READY_isr
+EE_READY_isr:
+    rjmp default_handler
+
+.weak AN_COMP_isr
+AN_COMP_isr:
+    rjmp default_handler
+
+.weak TWI_isr
+TWI_isr:
+    rjmp default_handler
+
+.weak SPM_READY_isr
+SPM_READY_isr:
+    rjmp default_handler
+
+
+delay_50ms:
+    ldi r18, 200      ; Outer loop count
+outer_loop:
+    ldi r19, 250      ; Middle loop count
+middle_loop:
+    ldi r20, 250      ; Inner loop count
+inner_loop:
+    dec r20           ; Decrease inner loop counter
+    brne inner_loop   ; Repeat until zero
+
+    dec r19           ; Decrease middle loop counter
+    brne middle_loop  ; Repeat until zero
+
+    dec r18           ; Decrease outer loop counter
+    brne outer_loop   ; Repeat until zero
+
+    ret               ; Return from function

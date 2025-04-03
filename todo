@@ -1,1 +1,3 @@
 - currently assuming linker symbols like _sdata _dataLMA are byte addresses if not working try writing code for word addresses
+- find a way to look at what linker sybols are (_sdata _edata _sbss etc)
+- datacopy loop and zerobss loop fail if .data and .bss have nothing in them so _sdata == _edata & _sbss == _ebss

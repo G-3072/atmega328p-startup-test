@@ -10,7 +10,7 @@ include(cmake/avr-gcc.cmake)
 
 target_sources(${PROJECT_NAME} PRIVATE
     src/main.s
-    # src/atmega328p_startup.s
+    src/atmega328p_startup.s
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

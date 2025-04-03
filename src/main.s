@@ -1,8 +1,8 @@
 .global main
 
+
 main:
   sbi   0x04, 5     ; Set PB5 as output
-
 blink:
   sbi   0x03, 5     ; Toggle PINB
   ldi   r25, hi8(500)
@@ -22,3 +22,38 @@ inner:
   sbiw    r24, 1
   brne    delay_ms
   ret
+
+; .section .data
+; nop
+; nop
+; nop
+
+; .section .bss
+; nop
+; nop
+; nop
+; .section .text
+; main:
+;   sbi 0x04, 5
+
+;   .word _sdata
+;   .word _edata
+;   .word _sidata
+;   .word _sbss
+;   .word _ebss
+
+;   ldi r16, hi8(_ebss)
+;   ldi r17, lo8(_ebss)
+
+;   ; cp r16, r17
+;   cpi r17, 0x0C
+;   ; cpi r16, 0x06
+
+;   breq ledOn
+;   ledOff:
+;     cbi 0x05, 5
+;     rjmp ledOff
+
+;   ledOn:
+;     sbi 0x05, 5
+;     rjmp ledOn
