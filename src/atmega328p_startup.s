@@ -8,55 +8,55 @@
 __vectors:
 .org 0x00
 rjmp Reset_Handler    ; startup code
-.org 0x02
+; .org 0x02
 rjmp INT0_isr   ; INT0 isr
-.org 0x04
+; .org 0x04
 rjmp INT1_isr
-.org 0x06
+; .org 0x06
 rjmp PCINT0_isr
-.org 0x08
+; .org 0x08
 rjmp PCINT1_isr
-.org 0x0A
+; .org 0x0A
 rjmp PCINT2_isr
-.org 0x0C
+; .org 0x0C
 rjmp WDT_isr
-.org 0x0E
+; .org 0x0E
 rjmp TIM2_COMPA_isr
-.org 0x10
+; .org 0x10
 rjmp TIM2_COMPB_isr
-.org 0x12
+; .org 0x12
 rjmp TIM2_OVF_isr
-.org 0x14
+; .org 0x14
 rjmp TIM1_CAPT_isr
-.org 0x16
+; .org 0x16
 rjmp TIM1_COMPA_isr
-.org 0x18
+; .org 0x18
 rjmp TIM1_COMPB_isr
-.org 0x1A
+; .org 0x1A
 rjmp TIM1_OVF_isr
-.org 0x1C
+; .org 0x1C
 rjmp TIM0_OVF_isr
-.org 0x1E
+; .org 0x1E
 rjmp TIM0_COMPA_isr
-.org 0x20
+; .org 0x20
 rjmp TIM0_COMPB_isr
-.org 0x22
+; .org 0x22
 rjmp SPI_STC_isr
-.org 0x24
+; .org 0x24
 rjmp USART_RX_isr
-.org 0x26
+; .org 0x26
 rjmp USART_UDRE_isr
-.org 0x28
+; .org 0x28
 rjmp USART_TX_isr
-.org 0x2A
+; .org 0x2A
 rjmp ADC_isr
-.org 0x2C
+; .org 0x2C
 rjmp EE_READY_isr
-.org 0x2E
+; .org 0x2E
 rjmp AN_COMP_isr
-.org 0x30
+; .org 0x30
 rjmp TWI_isr
-.org 0x32
+; .org 0x32
 rjmp SPM_READY_isr
 
 
@@ -96,15 +96,18 @@ Reset_Handler:
 
     copyDataLoop:
     cp r26, r28
-    breq zeroBssSection
+    ; X = 0x01A0 Y = 0x01AA
 
-    cp r27, r29
-    breq zeroBssSection
+    cpc r27, r28
+    brlo copyDataInnerLoop
 
-    lpm r16, Z+
-    st X+, r16
+    rjmp zeroBssSection
 
-    rjmp copyDataLoop
+    copyDataInnerLoop:
+        lpm r16, Z+
+        st X+, r16
+
+        rjmp copyDataLoop
 
     zeroBssSection:             ; zero out the .bss section in Ram
     ldi r26, lo8(_sbss)         ; store bss start address in X register
@@ -117,14 +120,17 @@ Reset_Handler:
 
     ZeroBssLoop:
     cp r26, r28
-    breq enableInterrupts
 
-    cp r27, r29
-    breq enableInterrupts
 
-    st X+, r16
+    cpc r27, r28
+    brlo ZeroBssInnerLoop
 
-    rjmp ZeroBssLoop
+    rjmp enableInterrupts
+
+    ZeroBssInnerLoop:
+        st X+, r16
+
+        rjmp copyDataLoop
 
     enableInterrupts:           ; set global interrupt bit in SREG
     sei
