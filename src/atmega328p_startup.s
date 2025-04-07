@@ -95,14 +95,16 @@ Reset_Handler:
     ldi r29, hi8(_edata)
 
     copyDataLoop:
+    cp r26, r28
+    breq zeroBssSection
+
+    cp r27, r29
+    breq zeroBssSection
+
     lpm r16, Z+
     st X+, r16
 
-    cp r28, r26         
-    brne copyDataLoop       ; jump back to copydata loop if current address (X register) is not equal to data end address
-
-    cp r29, r27
-    brne copyDataLoop
+    rjmp copyDataLoop
 
     zeroBssSection:             ; zero out the .bss section in Ram
     ldi r26, lo8(_sbss)         ; store bss start address in X register
@@ -114,23 +116,24 @@ Reset_Handler:
     ldi r16, 0x00
 
     ZeroBssLoop:
-    st X+, r16
-    
     cp r26, r28
-    ; brne ZeroBssLoop        ; jump back to zeroBssLoop if current ram address (X register) isnt equal to bss end address
+    breq enableInterrupts
 
-    cpC r27, r29
-    brne ZeroBssLoop
-    ; sbi 0x04, 5
-    ; cbi 0x05, 5
+    cp r27, r29
+    breq enableInterrupts
+
+    st X+, r16
+
+    rjmp ZeroBssLoop
+
     enableInterrupts:           ; set global interrupt bit in SREG
     sei
     ; cli
     
     clearSREG:                  ; clear the status register flags (bc seen in avr std startup code)
     .equ SREG, 0x3F
-    clr r0
-    out SREG, r0
+    ldi r16, 0x00
+    out SREG, r16
 
     callMain:
     rcall main
